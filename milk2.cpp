@@ -10,23 +10,16 @@ LANG: C++
 #include <vector>
 
 using namespace std;
-using std::sort;
 
 struct Time {
   int begin;
   int end;
-
-  // SO:1380463
-  bool operator < (const Time& str) const {
-    return (begin < str.begin);
-      }
 };
 
 vector<Time> times;
 
-
 int main() {
-  int begin, end, maxMilking, maxNonMilking;
+  int begin, end, maxMilking = 0, maxNonMilking = 0;
 
   ifstream fin("milk2.in");
   ofstream fout("milk2.out");
@@ -35,18 +28,30 @@ int main() {
 
   fin >> farmers;
 
-  Time t;
+  Time t, tSorted;
   for (int i = 0; i < farmers; i++) {
     fin >> t.begin >> t.end;
     times.push_back(t);
   }
 
-  sort(times.begin(), times.end());
-  
-  // SO:275994
-  for (vector<Time>::iterator it = times.begin(); it != times.end(); ++it) {
-    cout << it->begin << " " << it->end << endl;
+  for (int i = 0; i < farmers; i++) {
+    for (int j = 0; j < farmers - 1; j++) {
+      if (times.at(j).begin > times.at(j + 1).begin) {
+	int temp = times.at(j + 1).begin;
+	times.at(j + 1).begin = times.at(j).begin;
+	times.at(j).begin = temp;
+
+	temp = times.at(j + 1).end;
+	times.at(j + 1).end = times.at(j).end;
+	times.at(j).end = temp;
+      }
+    }
   }
+
+  // SO:275994
+  //  for (vector<Time>::iterator it = times.begin(); it != times.end(); ++it) {
+  //    cout << it->begin << " " << it->end << endl;
+  //  }
 
   begin = times.at(0).begin;
   end = times.at(0).end;
@@ -74,7 +79,7 @@ int main() {
     }
   }
 
-  fout << maxMilking << " " << maxNonMilking;
+  fout << maxMilking << " " << maxNonMilking << "\n";
 
   return EXIT_SUCCESS;
 }
